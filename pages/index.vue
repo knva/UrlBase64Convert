@@ -1,6 +1,6 @@
 <template>
   <div class="page-index">
-    <Logos />
+    <!-- <Logos /> -->
     <Examples />
   </div>
 </template>

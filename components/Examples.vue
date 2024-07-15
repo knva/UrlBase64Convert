@@ -1,72 +1,76 @@
 <script setup lang="ts">
 import zhCn from "element-plus/es/locale/lang/zh-cn";
 
-const timeValue = ref("");
-const hello = () => ElMessage.info("hello world");
-const helloSuccess = () => ElMessage.success("hello world");
-
-const color = useColorMode();
-const colorMode = computed({
-  get: () => color.value === 'dark',
-  set: () => (color.preference = (color.value === 'dark' ? 'light' : 'dark')),
-});
+const encodeText = ref("");
+const decodeText = ref("");
+const decode = () => {
+  //先urldecode然后base64
+  decodeText.value = atob(decodeURIComponent(encodeText.value));
+};
+const encode = () => {
+  //先base64然后urlencode
+  encodeText.value = encodeURIComponent(btoa(decodeText.value));
+};
+const clear = () => {
+  encodeText.value = "";
+  decodeText.value = "";
+};
+const copyText = (text: string) => {
+  const input = document.createElement("input");
+  input.setAttribute("readonly", "readonly");
+  input.setAttribute("value", text);
+  document.body.appendChild(input);
+  input.select();
+  if (document.execCommand("copy")) {
+    document.execCommand("copy");
+    console.log("复制成功");
+    ElMessage({
+      message: "copy success",
+      type: "success",
+    });
+  }
+  document.body.removeChild(input);
+};
 </script>
 
 
 <template>
-  <ClientOnly>
-    <el-switch v-model="colorMode" inline-prompt active-text="dark" inactive-text="light" size="large"></el-switch>
-  </ClientOnly>
+  <div>
+    <!--标题，解密工具-->
+    <h1>Decode Tool</h1>
+    <!--提示用户输入的文本-->
 
-  <br />
-
-  <el-dropdown class="m-4" type="primary">
-    <el-button type="primary">
-      Dropdown List
-      <el-icon class="el-icon--right">
-        <el-icon-arrow-down />
-      </el-icon>
-    </el-button>
-    <template #dropdown>
-      <el-dropdown-menu>
-        <el-dropdown-item>Action 1</el-dropdown-item>
-        <el-dropdown-item>Action 2</el-dropdown-item>
-        <el-dropdown-item>Action 3</el-dropdown-item>
-        <el-dropdown-item>Action 4</el-dropdown-item>
-        <el-dropdown-item>Action 5</el-dropdown-item>
-      </el-dropdown-menu>
-    </template>
-  </el-dropdown>
-
-  <br />
-
-  <el-button :icon="ElIconView" class="m-4" @click="hello">Hello</el-button>
-  <el-button class="m-4" type="primary" @click="hello">Hello</el-button>
-  <el-button class="m-4" type="success" @click="helloSuccess">Hello</el-button>
-
-  <br />
-
-  <Counter class="m-4" />
-
-  <br />
-
-  <el-icon class="cursor-pointer">
-    <el-icon-grape />
-  </el-icon>
-  <el-icon class="cursor-pointer">
-    <ElIconIceCream />
-  </el-icon>
-  <el-icon class="cursor-pointer mb-4">
-    <ElIconIceDrink />
-  </el-icon>
-
-  <br />
-
-  <el-config-provider :locale="zhCn">
-    <el-date-picker
-      v-model="timeValue"
-      type="date"
-      placeholder="请选择日期"
+    <el-input
+      v-model="encodeText"
+      style="width: 480px"
+      :rows="20"
+      type="textarea"
+      placeholder="输入加密文本"
     />
-  </el-config-provider>
+
+    <el-divider direction="vertical" />
+    <el-input
+      v-model="decodeText"
+      style="width: 480px"
+      :rows="20"
+      type="textarea"
+      placeholder="解密内容"
+    />
+    <br />
+    <div class="buttons">
+      <!--解密-->
+      <el-button type="primary" @click="decode">Decode</el-button>
+      <!--加密-->
+      <el-button type="primary" @click="encode">Encode</el-button>
+      <!--清空-->
+      <el-button @click="clear">Clear</el-button>
+      <!--复制-->
+      <el-button type="primary" @click="copyText(decodeText)">Copy</el-button>
+    </div>
+  </div>
 </template>
+<style scoped>
+.buttons {
+  margin-top: 20px;
+}
+</style>
