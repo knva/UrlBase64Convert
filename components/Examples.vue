@@ -3,13 +3,29 @@ import zhCn from "element-plus/es/locale/lang/zh-cn";
 
 const encodeText = ref("");
 const decodeText = ref("");
+// Base64 编码
+const base64Encode = (str: string | undefined) => {
+  const utf8Bytes = new TextEncoder().encode(str);
+  return btoa(String.fromCharCode(...utf8Bytes));
+};
+
+// Base64 解码
+const base64Decode = (str: string) => {
+  const binaryString = atob(str);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return new TextDecoder().decode(bytes);
+};
 const decode = () => {
   //先urldecode然后base64
-  decodeText.value = atob(decodeURIComponent(encodeText.value));
+  decodeText.value = base64Decode(decodeURIComponent(encodeText.value));
 };
 const encode = () => {
   //先base64然后urlencode
-  encodeText.value = encodeURIComponent(btoa(decodeText.value));
+
+  decodeText.value = encodeURIComponent(base64Encode(encodeText.value));
 };
 const clear = () => {
   encodeText.value = "";
@@ -45,7 +61,7 @@ const copyText = (text: string) => {
       style="width: 480px"
       :rows="20"
       type="textarea"
-      placeholder="输入加密文本"
+      placeholder="输入"
     />
 
     <el-divider direction="vertical" />
@@ -54,7 +70,7 @@ const copyText = (text: string) => {
       style="width: 480px"
       :rows="20"
       type="textarea"
-      placeholder="解密内容"
+      placeholder="输出"
     />
     <br />
     <div class="buttons">
