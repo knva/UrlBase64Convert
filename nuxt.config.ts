@@ -3,22 +3,24 @@ export default defineNuxtConfig({
   app: {
     // head
     head: {
-      title: 'Decode UrlEncode Base64',
+      title: "Decode UrlEncode Base64",
       meta: [
-        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
         {
-          hid: 'description',
-          name: 'description',
-          content: 'Decode UrlEncode Base64',
+          hid: "description",
+          name: "description",
+          content: "Decode UrlEncode Base64",
         },
       ],
-      link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
-    }
+      link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
+    },
   },
 
   // css
-  css: ['~/assets/scss/index.scss'],
-
+  css: ["~/assets/scss/index.scss", "vue-json-pretty/lib/styles.css"],
+  plugins: [
+    '@/plugins/vue-json-pretty'
+  ],
   typescript: {
     strict: true,
     shim: false,
@@ -26,11 +28,11 @@ export default defineNuxtConfig({
 
   // build modules
   modules: [
-    '@vueuse/nuxt',
-    '@unocss/nuxt',
-    '@pinia/nuxt',
-    '@element-plus/nuxt',
-    '@nuxtjs/color-mode'
+    "@vueuse/nuxt",
+    "@unocss/nuxt",
+    "@pinia/nuxt",
+    "@element-plus/nuxt",
+    "@nuxtjs/color-mode",
   ],
 
   // vueuse
@@ -40,7 +42,7 @@ export default defineNuxtConfig({
 
   // colorMode
   colorMode: {
-    classSuffix: '',
+    classSuffix: "",
   },
 
   unocss: {
@@ -60,8 +62,8 @@ export default defineNuxtConfig({
     },
   },
   elementPlus: {
-    icon: 'ElIcon',
-    importStyle: 'scss',
-    themes: ['dark'],
+    icon: "ElIcon",
+    importStyle: "scss",
+    themes: ["dark"],
   },
-})
+});
