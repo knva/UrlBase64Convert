@@ -3,9 +3,9 @@ import zhCn from "element-plus/es/locale/lang/zh-cn";
 
 import VueJsonPretty from "vue-json-pretty";
 import "vue-json-pretty/lib/styles.css";
-// components(){
-//   VueJsonPretty
-// }
+
+const { $windowHeight } = useNuxtApp();
+
 const encodeText = ref("");
 const decodeText = ref("");
 //json结构体
@@ -18,7 +18,10 @@ const jsonData = computed(() => {
 });
 
 const pageHeight = computed(() => {
-  return window.innerHeight;
+  if (process.client) {
+    const { height, width } = window.screen;
+    return height;
+  }
 });
 // Base64 编码
 const base64Encode = (str: string | undefined) => {
@@ -74,16 +77,14 @@ const copyText = (text: string) => {
 
     <div class="container">
       <div class="left-column">
-        
-    <h1>Decode Tool</h1>
+        <h1>Decode Tool</h1>
         <div class="input-group">
           <el-input
             v-model="encodeText"
             type="textarea"
             class="input-textarea"
             placeholder="输入"
-            
-        :autosize="{ minRows: 10, maxRows: 10 }"
+            :autosize="{ minRows: 10, maxRows: 10 }"
           />
         </div>
         <div class="buttons">
@@ -104,8 +105,7 @@ const copyText = (text: string) => {
             type="textarea"
             class="input-textarea"
             placeholder="输出"
-            
-        :autosize="{ minRows: 10, maxRows: 10 }"
+            :autosize="{ minRows: 10, maxRows: 10 }"
           />
         </div>
       </div>
