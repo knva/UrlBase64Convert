@@ -20,6 +20,7 @@ export default defineNuxtConfig({
   css: ["~/assets/scss/index.scss", "vue-json-pretty/lib/styles.css"],
   plugins: [
     '@/plugins/vue-json-pretty',
+    '@/plugins/vue-devui'
   ],
   typescript: {
     strict: true,

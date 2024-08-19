@@ -4,25 +4,19 @@ import zhCn from "element-plus/es/locale/lang/zh-cn";
 import VueJsonPretty from "vue-json-pretty";
 import "vue-json-pretty/lib/styles.css";
 
-const { $windowHeight } = useNuxtApp();
-
 const encodeText = ref("");
 const decodeText = ref("");
-//json结构体
-const jsonData = computed(() => {
+
+const prettyJson = computed(() => {
+  // return JSON.stringify(jsonData.value, null, 2);
+  // 是json就美化，不是json就原样
   try {
-    return JSON.parse(decodeText.value);
+    return JSON.stringify(decodeText.value, null, 2);
   } catch (e) {
-    return {};
+    return decodeText.value;
   }
 });
 
-const pageHeight = computed(() => {
-  if (process.client) {
-    const { height, width } = window.screen;
-    return height - 155;
-  }
-});
 const deepVar = ref(1);
 // Base64 编码
 const base64Encode = (str: string | undefined) => {
@@ -31,11 +25,11 @@ const base64Encode = (str: string | undefined) => {
 };
 const fold = () => {
   //折叠
-  deepVar.value=1;
+  deepVar.value = 1;
 };
 const unfold = () => {
   //展开
-  deepVar.value=1111;
+  deepVar.value = 1111;
 };
 // Base64 解码
 const base64Decode = (str: string) => {
@@ -123,18 +117,24 @@ const copyText = (text: string) => {
       </el-aside>
       <el-main>
         <!-- 按钮组-->
-        <!--折叠-->
-        <el-button type="primary" @click="fold">Fold</el-button>
+        <!--  折叠 -->
+        <!-- <el-button type="primary" @click="fold">Fold</el-button> -->
         <!--展开-->
-        <el-button type="primary" @click="unfold">Unfold</el-button>
-        <vue-json-pretty
+        <!-- <el-button type="primary" @click="unfold">Unfold</el-button> -->
+        <d-code-editor
+          id="codeview"
+          v-model="prettyJson"
+          :options="{ language: 'json' }"
+        ></d-code-editor>
+        <!-- <vue-json-pretty
           :data="jsonData"
           :showIcon="true"
           :virtual="true"
           class="json-pretty"
           :deep="deepVar"
-          :height="pageHeight"
-      /></el-main>
+          :height="pageHeight" -->
+        <!-- /> -->
+      </el-main>
     </el-container>
   </div>
 </template>
@@ -154,5 +154,10 @@ const copyText = (text: string) => {
 .input-group {
   flex: 1;
   margin-bottom: 10px; /* Adjust spacing as needed */
+}
+#codeview {
+  height: calc(100vh - 55px);
+  /* 左对齐 */
+  text-align: left;
 }
 </style>

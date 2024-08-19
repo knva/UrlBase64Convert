@@ -20,8 +20,11 @@
     "postinstall": "nuxi prepare"
   },
   "dependencies": {
+    "@devui-design/icons": "^1.4.0",
     "@element-plus/icons-vue": "^2.3.1",
+    "devui-theme": "^0.0.7",
     "element-plus": "^2.4.4",
+    "vue-devui": "^1.6.21",
     "vue-json-pretty": "^2.4.0"
   },
   "devDependencies": {
