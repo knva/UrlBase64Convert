@@ -1,53 +1,32 @@
 {
-  "name": "element-plus-nuxt-starter",
+  "name": "url-base64-convert",
   "packageManager": "pnpm@8.12.1",
-  "version": "0.1.0",
-  "description": "Element Plus with Nuxt 3 Minimal Starter",
+  "version": "1.0.0",
+  "description": "Large text URL/Base64 converter running entirely in the browser",
   "repository": {
     "type": "git",
-    "url": "git://github.com/element-plus/element-plus-nuxt-starter"
+    "url": "https://github.com/knva/UrlBase64Convert.git"
   },
-  "author": "Element Plus Team",
+  "author": "knva",
   "license": "MIT",
   "private": true,
+  "type": "module",
   "scripts": {
-    "preinstall": "npx only-allow pnpm",
     "dev": "nuxi dev",
     "build": "nuxi build",
     "preview": "nuxi preview",
     "start": "node .output/server/index.mjs",
     "generate": "nuxi generate",
+    "typecheck": "nuxi typecheck",
+    "test:large": "node tests/base64-large.mjs",
+    "test:fixtures": "node tests/create-large-fixture.mjs",
     "postinstall": "nuxi prepare"
   },
-  "dependencies": {
-    "@devui-design/icons": "^1.4.0",
-    "@element-plus/icons-vue": "^2.3.1",
-    "devui-theme": "^0.0.7",
-    "element-plus": "^2.4.4",
-    "vue-devui": "^1.6.21",
-    "vue-json-pretty": "^2.4.0"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@element-plus/nuxt": "^1.0.7",
-    "@nuxtjs/color-mode": "^3.3.2",
-    "@pinia/nuxt": "^0.5.1",
-    "@unocss/nuxt": "^0.58.0",
-    "@vueuse/nuxt": "^10.7.0",
-    "consola": "^3.2.3",
-    "nuxt": "^3.8.2",
-    "sass": "^1.69.5",
-    "typescript": "^5.3.3"
-  },
-  "peerDependencies": {
-    "pinia": "^2.1.6"
-  },
-  "pnpm": {
-    "peerDependencyRules": {
-      "ignoreMissing": [
-        "webpack",
-        "vite",
-        "vue"
-      ]
-    }
+    "@types/node": "22.20.1",
+    "nuxt": "3.21.9",
+    "typescript": "5.9.3",
+    "vue-tsc": "3.3.8"
   }
 }

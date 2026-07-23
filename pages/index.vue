@@ -1,12 +1,5 @@
 <template>
-  <div class="page-index">
-    <!-- <Logos /> -->
+  <main class="page-index">
     <Examples />
-  </div>
+  </main>
 </template>
-
-<style>
-.page-index {
-  text-align: center;
-}
-</style>

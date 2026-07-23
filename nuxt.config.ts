@@ -1,70 +1,32 @@
-// https://v3.nuxtjs.org/docs/directory-structure/nuxt.config
+const baseURL = process.env.NUXT_APP_BASE_URL || "/";
+
 export default defineNuxtConfig({
   app: {
-    // head
+    baseURL,
     head: {
-      title: "Decode UrlEncode Base64",
+      title: "URL Base64 大文本转换工具",
+      htmlAttrs: {
+        lang: "zh-CN",
+      },
       meta: [
         { name: "viewport", content: "width=device-width, initial-scale=1" },
         {
-          hid: "description",
           name: "description",
-          content: "Decode UrlEncode Base64",
+          content: "在浏览器本地分块编码和解码 URL/Base64，支持 20MB 以上大文本。",
         },
+        { name: "theme-color", content: "#07111f" },
       ],
-      link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
+      link: [
+        { rel: "icon", type: "image/x-icon", href: `${baseURL}favicon.ico` },
+      ],
     },
   },
-
-  // css
-  css: ["~/assets/scss/index.scss", "vue-json-pretty/lib/styles.css"],
-  plugins: [
-    '@/plugins/vue-json-pretty',
-    '@/plugins/vue-devui'
-  ],
+  css: ["~/assets/css/index.css"],
+  devtools: {
+    enabled: false,
+  },
   typescript: {
     strict: true,
     shim: false,
-  },
-
-  // build modules
-  modules: [
-    "@vueuse/nuxt",
-    "@unocss/nuxt",
-    "@pinia/nuxt",
-    "@element-plus/nuxt",
-    "@nuxtjs/color-mode",
-  ],
-
-  // vueuse
-  vueuse: {
-    ssrHandlers: true,
-  },
-
-  // colorMode
-  colorMode: {
-    classSuffix: "",
-  },
-
-  unocss: {
-    uno: true,
-    attributify: true,
-    icons: {
-      scale: 1.2,
-    },
-  },
-  vite: {
-    css: {
-      preprocessorOptions: {
-        scss: {
-          additionalData: `@use "@/assets/scss/element/index.scss" as element;`,
-        },
-      },
-    },
-  },
-  elementPlus: {
-    icon: "ElIcon",
-    importStyle: "scss",
-    themes: ["dark"],
   },
 });
