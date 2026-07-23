@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { Component } from "vue";
+
 type Operation = "encode" | "decode";
 
 interface ProgressMessage {
@@ -28,6 +30,7 @@ interface ErrorMessage {
 type WorkerMessage = ProgressMessage | ResultMessage | ErrorMessage;
 
 const INLINE_RESULT_LIMIT = 2_000_000;
+const JSON_AUTO_FORMAT_LIMIT = 1_000_000;
 
 const inputElement = ref<HTMLTextAreaElement | null>(null);
 const fileElement = ref<HTMLInputElement | null>(null);
@@ -44,6 +47,11 @@ const progress = ref(0);
 const stage = ref("等待输入");
 const statusKind = ref<"normal" | "success" | "error">("normal");
 const copyLabel = ref("复制完整结果");
+const jsonText = shallowRef("");
+const jsonViewerOpen = ref(false);
+const jsonLoading = ref(false);
+const jsonIsFormatted = ref(false);
+const jsonViewerComponent = shallowRef<Component | null>(null);
 
 let converterWorker: Worker | null = null;
 let requestSequence = 0;
@@ -59,6 +67,8 @@ const inputSummary = computed(() => {
 const outputSummary = computed(() =>
   outputBlob.value ? formatBytes(outputSize.value) : "尚无结果",
 );
+
+const jsonCandidate = computed(() => looksLikeJson(outputText.value));
 
 function formatBytes(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
@@ -80,12 +90,18 @@ function releaseDownloadUrl() {
 }
 
 function resetResult() {
+  closeJsonViewer();
   releaseDownloadUrl();
   outputText.value = "";
   outputBlob.value = null;
   outputSize.value = 0;
   resultIsPreview.value = false;
   copyLabel.value = "复制完整结果";
+}
+
+function looksLikeJson(text: string) {
+  const firstCharacter = text.trimStart().charAt(0);
+  return firstCharacter === "{" || firstCharacter === "[";
 }
 
 function createWorker() {
@@ -260,6 +276,58 @@ async function showFullResult() {
   stage.value = "完整结果已显示";
 }
 
+async function openJsonViewer() {
+  if (!outputBlob.value || !jsonCandidate.value || jsonLoading.value) return;
+  jsonLoading.value = true;
+  statusKind.value = "normal";
+  stage.value = "正在载入 JSON 高性能视图";
+
+  try {
+    const [componentModule, blobText] = await Promise.all([
+      jsonViewerComponent.value
+        ? Promise.resolve(null)
+        : import("./JsonViewer.client.vue"),
+      outputBlob.value.text(),
+    ]);
+    if (componentModule) {
+      jsonViewerComponent.value = markRaw(componentModule.default);
+    }
+
+    let text = blobText;
+    if (!looksLikeJson(text)) {
+      throw new Error("结果不是 JSON 对象或数组");
+    }
+
+    jsonIsFormatted.value = false;
+    if (text.length <= JSON_AUTO_FORMAT_LIMIT) {
+      try {
+        text = JSON.stringify(JSON.parse(text), null, 2);
+        jsonIsFormatted.value = true;
+      } catch {
+        // JSON 语法问题由 CodeMirror 视图保留原文展示。
+      }
+    }
+
+    jsonText.value = text;
+    jsonViewerOpen.value = true;
+    statusKind.value = "success";
+    stage.value = jsonIsFormatted.value
+      ? "JSON 已格式化并打开，可使用 Ctrl/⌘ F 搜索"
+      : "JSON 高性能视图已打开，可使用 Ctrl/⌘ F 搜索";
+  } catch (error) {
+    statusKind.value = "error";
+    stage.value = error instanceof Error ? error.message : String(error);
+  } finally {
+    jsonLoading.value = false;
+  }
+}
+
+function closeJsonViewer() {
+  jsonViewerOpen.value = false;
+  jsonText.value = "";
+  jsonIsFormatted.value = false;
+}
+
 onBeforeUnmount(() => {
   terminateWorker();
   releaseDownloadUrl();
@@ -273,7 +341,7 @@ onBeforeUnmount(() => {
       <h1>URL Base64 大文本转换</h1>
       <p class="hero-copy">
         转换在浏览器本地完成。分块算法与独立线程避免大数组调用栈溢出，
-        20MB 以上建议直接选择文件。
+        20MB 以上建议直接选择文件；解码后的 JSON 可使用虚拟化视图搜索与折叠。
       </p>
     </header>
 
@@ -382,6 +450,20 @@ onBeforeUnmount(() => {
         <div class="actions output-actions">
           <button
             type="button"
+            class="button button-json"
+            data-testid="open-json-viewer"
+            :disabled="!jsonCandidate || jsonLoading"
+            :title="
+              jsonCandidate
+                ? '使用 CodeMirror 6 打开 JSON 高性能视图'
+                : '当前结果不是 JSON 对象或数组'
+            "
+            @click="openJsonViewer"
+          >
+            {{ jsonLoading ? "正在载入 JSON…" : "JSON 查看" }}
+          </button>
+          <button
+            type="button"
             class="button button-secondary"
             :disabled="!outputBlob"
             @click="copyResult"
@@ -408,6 +490,17 @@ onBeforeUnmount(() => {
       </article>
     </section>
 
+    <ClientOnly>
+      <component
+        :is="jsonViewerComponent"
+        v-if="jsonViewerOpen && jsonViewerComponent"
+        :content="jsonText"
+        :formatted="jsonIsFormatted"
+        :size="outputSize"
+        @close="closeJsonViewer"
+      />
+    </ClientOnly>
+
     <section class="feature-strip" aria-label="处理特性">
       <div>
         <strong>Web Worker</strong>
@@ -420,6 +513,10 @@ onBeforeUnmount(() => {
       <div>
         <strong>本地处理</strong>
         <span>输入内容不会上传服务器</span>
+      </div>
+      <div>
+        <strong>JSON 搜索</strong>
+        <span>虚拟渲染、折叠和全文定位</span>
       </div>
     </section>
   </div>

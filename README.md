@@ -2,6 +2,8 @@
 
 浏览器本地运行的 URL/Base64 大文本转换工具，支持普通文本、URL 编码 Base64、原始 Base64 和 Base64URL。
 
+解码结果为 JSON 对象或数组时，可打开基于 CodeMirror 6 的高性能视图，支持全文搜索、大小写/正则/全词匹配、结果跳转和节点折叠。
+
 ## 为什么现在能处理 20MB+
 
 - 转换逻辑放入 Web Worker，不阻塞页面主线程。
@@ -10,6 +12,8 @@
 - 超过 2MB 的结果默认只渲染前 20 万字符，完整结果保存在 Blob 中供复制或下载。
 - 可直接选择文本文件，避免把几十 MB 内容粘贴进 DOM 文本框。
 - 移除了 Element Plus、Vue DevUI 代码编辑器、JSON Pretty、Pinia 和 UnoCSS 等未使用依赖。
+- JSON 组件点击时才动态加载，不进入首屏 preload/prefetch。
+- 1MB 以下 JSON 自动格式化；大 JSON 保持原始格式，避免额外的完整解析和内存复制。
 
 > 实际上限取决于浏览器可用内存。20MB～100MB 建议使用文件模式，并优先下载结果，不要强制“显示完整结果”。
 
@@ -32,6 +36,8 @@ pnpm generate
 静态文件输出到 `.output/public`。仓库中的 GitHub Actions 会将该目录部署到 GitHub Pages；Vercel 也可直接识别 Nuxt 项目。
 
 本地验收使用 21MiB 中英文/Emoji 混合文本完成编码→解码 SHA-256 回环校验，并在真实浏览器中验证了 21MiB 文件编码和 28MiB Base64 文件解码。可运行 `pnpm test:fixtures` 生成浏览器压力测试用文件；它们会写入已忽略的 `tests/tmp`。
+
+JSON 压力测试使用 20MiB、182,711 行文档：视图打开后可见 DOM 仅渲染约 36 行；搜索位于文档中部的唯一标记后正确滚动并高亮。测试机器上打开约 5.3 秒，搜索约 2.1 秒，实际结果取决于浏览器和硬件。
 
 GitHub Pages 构建会自动使用 `/UrlBase64Convert/` 子路径；Vercel 和本地构建继续使用根路径 `/`。
 

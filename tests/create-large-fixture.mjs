@@ -1,4 +1,4 @@
-import { mkdir, open, writeFile } from "node:fs/promises";
+import { mkdir, open, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -27,3 +27,44 @@ const encodedFixturePath = resolve(
 const encodedFixture = Buffer.alloc(21 * 1024 * 1024, "x").toString("base64");
 await writeFile(encodedFixturePath, encodedFixture, "ascii");
 console.log(encodedFixturePath);
+
+const largeJsonPath = resolve(
+  dirname(fileURLToPath(import.meta.url)),
+  "tmp/large-json.json",
+);
+const largeJsonFile = await open(largeJsonPath, "w");
+const jsonTargetBytes = 20 * 1024 * 1024;
+const jsonHeader = '{\n  "items": [\n';
+let jsonBytes = Buffer.byteLength(jsonHeader);
+let jsonBuffer = jsonHeader;
+let recordIndex = 0;
+
+try {
+  while (jsonBytes < jsonTargetBytes) {
+    const name =
+      recordIndex === 123_456
+        ? "needle-json-search-987654"
+        : `entry-${recordIndex}`;
+    const line = `    {"id":${recordIndex},"name":"${name}","value":"${"x".repeat(64)}"},\n`;
+    jsonBuffer += line;
+    jsonBytes += Buffer.byteLength(line);
+    recordIndex += 1;
+    if (jsonBuffer.length >= 1024 * 1024) {
+      await largeJsonFile.write(jsonBuffer);
+      jsonBuffer = "";
+    }
+  }
+  jsonBuffer += '    {"id":-1,"name":"final-record","value":"done"}\n  ]\n}\n';
+  await largeJsonFile.write(jsonBuffer);
+} finally {
+  await largeJsonFile.close();
+}
+
+const largeJsonBase64Path = resolve(
+  dirname(fileURLToPath(import.meta.url)),
+  "tmp/large-json.base64",
+);
+const largeJsonBytes = await readFile(largeJsonPath);
+await writeFile(largeJsonBase64Path, largeJsonBytes.toString("base64"), "ascii");
+console.log(largeJsonPath);
+console.log(largeJsonBase64Path);

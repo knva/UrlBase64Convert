@@ -22,7 +22,13 @@
     "test:fixtures": "node tests/create-large-fixture.mjs",
     "postinstall": "nuxi prepare"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@codemirror/lang-json": "6.0.2",
+    "@codemirror/language": "6.12.4",
+    "@codemirror/search": "6.7.1",
+    "@codemirror/state": "6.7.1",
+    "@codemirror/view": "6.43.6"
+  },
   "devDependencies": {
     "@types/node": "22.20.1",
     "nuxt": "3.21.9",

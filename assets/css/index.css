@@ -256,6 +256,12 @@ a {
   background: rgba(67, 115, 218, 0.2);
 }
 
+.button-json {
+  border-color: rgba(185, 126, 255, 0.38);
+  color: #d8baff;
+  background: rgba(138, 78, 211, 0.16);
+}
+
 .button-ghost {
   border-color: rgba(142, 167, 190, 0.18);
   color: #9eb0c2;
@@ -307,7 +313,7 @@ a {
 
 .feature-strip {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 1px;
   margin-top: 18px;
   overflow: hidden;
@@ -342,6 +348,10 @@ a {
 
   .workspace {
     grid-template-columns: 1fr;
+  }
+
+  .feature-strip {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .text-area,
